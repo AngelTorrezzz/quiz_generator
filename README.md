@@ -1,6 +1,35 @@
-# quiz_generator
+# 📱 Quiz-Generator
 
-A new Flutter project.
+**Quiz-Generator** es una aplicación móvil desarrollada en Flutter que permite generar cuestionarios personalizados para practicar temas de interés. Utiliza APIs públicas como [OpenTDB](https://opentdb.com/) y [QuizAPI](https://quizapi.io/) para obtener preguntas dinámicas.
+
+> Desarrollado por: **Angel de Jesús Alvarado Torres**
+
+---
+
+## 🚀 Características
+
+- Generación de cuestionarios personalizados.
+- Selección de cantidad de preguntas y nivel de dificultad.
+- Interfaz móvil optimizada y amigable.
+- Integración con APIs externas para contenido actualizado.
+
+---
+
+## 🛠️ Tecnologías
+
+- **Flutter**: SDK para el desarrollo de apps móviles multiplataforma.
+- **Dart**: Lenguaje de programación principal del proyecto.
+- **OpenTDB API** y **QuizAPI**: Para la generación dinámica de preguntas.
+
+---
+
+## 📦 Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tu_usuario/quiz-generator.git
+   cd quiz-generator
+
 
 ## Getting Started
 
