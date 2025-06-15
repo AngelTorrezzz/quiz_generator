@@ -25,7 +25,7 @@ class FormQuestions extends StatelessWidget {
         ),
       ),
       body: Container(
-        color: color.tertiary,
+        color: color.secondary,
         child: ListView.builder(
           padding: const EdgeInsets.all(16.0),
           itemCount: preguntas.length,
