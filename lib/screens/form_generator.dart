@@ -11,10 +11,23 @@ class FormGenerator extends StatefulWidget {
 }
 
 class _FormGeneratorState extends State<FormGenerator> {
-  final List<String> dificultades = ['Fácil', 'Medio', 'Difícil', 'Experto'];
-  final List<String> temas = ['Programación', 'Matemáticas', 'Ciencias', 'Geografía', 'Literatura', 'Historia'];
-  String? dificultadSeleccionada;
+  final Map<String, int> temas = {
+    'Computación': 18,     // Science: Computers
+    'Matemáticas': 19,      // Science: Mathematics
+    'Ciencias': 17,         // Science & Nature
+    'Geografía': 22,        // Geography
+    'Literatura': 10,       // Entertainment: Books
+    'Historia': 23,         // History
+  };
+  
+  final Map<String, String> dificultades = {
+    'Fácil': 'easy',
+    'Medio': 'medium',
+    'Difícil': 'hard',
+  };
+  
   String? temaSeleccionado;
+  String? dificultadSeleccionada;
   int? cantidadPreguntas;
 
   @override
@@ -74,7 +87,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                     ),
                      DropdownButtonFormField<String>(
                       hint: Text(
-                        'Ej. Programación, Matemáticas, Ciencias...',
+                        'Ej. Computación, Matemáticas, Ciencias...',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                           fontSize: 18,
@@ -84,8 +97,8 @@ class _FormGeneratorState extends State<FormGenerator> {
                       style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                       dropdownColor: Theme.of(context).colorScheme.tertiary,
                       value: temaSeleccionado,
-                      items: temas
-                          .map((tema) => DropdownMenuItem(
+                      items: temas.keys
+                          .map((tema) => DropdownMenuItem<String>(
                                 value: tema,
                                 child: Text(
                                   tema,
@@ -98,7 +111,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                           .toList(),
                       onChanged: (value) {
                         setState(() {
-                          temaSeleccionado = value;
+                          temaSeleccionado = value!;
                         });
                       },
                       decoration: InputDecoration(
@@ -198,7 +211,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                       style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                       dropdownColor: Theme.of(context).colorScheme.tertiary,
                       value: dificultadSeleccionada,
-                      items: dificultades
+                      items: dificultades.keys
                           .map((nivel) => DropdownMenuItem(
                                 value: nivel,
                                 child: Text(
@@ -244,8 +257,11 @@ class _FormGeneratorState extends State<FormGenerator> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FormQuestions(title: temaSeleccionado!, 
-                                  dificultadSeleccionada: dificultadSeleccionada!,
+                                builder: (context) => FormQuestions(
+                                  temaString: temaSeleccionado!,
+                                  temaId: temas[temaSeleccionado!]!,
+                                  dificultadSeleccionadaString: dificultadSeleccionada!,
+                                  dificultadSeleccionadaId: dificultades[dificultadSeleccionada!]!,
                                   cantidadPreguntas: cantidadPreguntas!,
                                 ),
                               ),
