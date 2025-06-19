@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/screens/form_generator.dart';
-import 'package:quiz_generator/screens/form_questions.dart';
 
 void main() {
   runApp(const MyApp());

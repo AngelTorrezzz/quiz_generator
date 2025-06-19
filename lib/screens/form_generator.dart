@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:quiz_generator/screens/form_questions.dart';
 
 class FormGenerator extends StatefulWidget {
   const FormGenerator(this.title, {super.key});
@@ -10,7 +12,10 @@ class FormGenerator extends StatefulWidget {
 
 class _FormGeneratorState extends State<FormGenerator> {
   final List<String> dificultades = ['Fácil', 'Medio', 'Difícil', 'Experto'];
+  final List<String> temas = ['Programación', 'Matemáticas', 'Ciencias', 'Geografía', 'Literatura', 'Historia'];
   String? dificultadSeleccionada;
+  String? temaSeleccionado;
+  int? cantidadPreguntas;
 
   @override
   Widget build(BuildContext context) {
@@ -67,13 +72,36 @@ class _FormGeneratorState extends State<FormGenerator> {
                         ),
                       ],
                     ),
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Ej: Historia, Matemáticas, Ciencias...',
-                        hintStyle: TextStyle(
+                     DropdownButtonFormField<String>(
+                      hint: Text(
+                        'Ej. Programación, Matemáticas, Ciencias...',
+                        style: TextStyle(
                           color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                          fontSize: 16,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w300,
                         ),
+                      ),
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                      dropdownColor: Theme.of(context).colorScheme.tertiary,
+                      value: temaSeleccionado,
+                      items: temas
+                          .map((tema) => DropdownMenuItem(
+                                value: tema,
+                                child: Text(
+                                  tema,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          temaSeleccionado = value;
+                        });
+                      },
+                      decoration: InputDecoration(
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiary),
                         ),
@@ -81,7 +109,6 @@ class _FormGeneratorState extends State<FormGenerator> {
                           borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 2),
                         ),
                       ),
-                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                     ),
                     SizedBox(height: 16),
 
@@ -107,7 +134,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                         hintText: 'Ej: 10, 20, 30...',
                         hintStyle: TextStyle(
                           color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w300,
                         ),
                         enabledBorder: UnderlineInputBorder(
@@ -119,7 +146,26 @@ class _FormGeneratorState extends State<FormGenerator> {
                       ),
                       keyboardType: TextInputType.number,
                       style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                      
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      onChanged: (value) {
+                        // Aquí puedes manejar el valor ingresado si es necesario
+                        cantidadPreguntas = int.tryParse(value) ?? 0;
+                        //print('Cantidad de preguntas: $cantidadPreguntas');
+                        if (cantidadPreguntas! < 1) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Por favor, ingresa un número mayor a 0',
+                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                              ),
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              duration: const Duration(milliseconds: 1500),
+                            ),
+                          );
+                        }
+                      },
                     ),
                     SizedBox(height: 16),
 
@@ -145,7 +191,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                         'Selecciona la dificultad',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w300,
                         ),
                       ),
@@ -158,7 +204,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                                 child: Text(
                                   nivel,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 18,
                                     color: Theme.of(context).colorScheme.secondary,
                                   ),
                                 ),
@@ -183,16 +229,38 @@ class _FormGeneratorState extends State<FormGenerator> {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Formulario enviado',
-                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                          if (temaSeleccionado == null || dificultadSeleccionada == null || cantidadPreguntas == null || (cantidadPreguntas != null && cantidadPreguntas! < 1)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Por favor, completa todos los campos',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                ),
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                duration: const Duration(seconds: 2),
                               ),
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              duration: const Duration(milliseconds: 750),
-                            ),
-                          );
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FormQuestions(title: temaSeleccionado!, 
+                                  dificultadSeleccionada: dificultadSeleccionada!,
+                                  cantidadPreguntas: cantidadPreguntas!,
+                                ),
+                              ),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Formulario enviado',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                ),
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                duration: const Duration(milliseconds: 750),
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.tertiary,
@@ -202,7 +270,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                           ),
                         ),
                         child: Text(
-                          'Confirmar',
+                          'Generar',
                           style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500),
                         ),
                       ),

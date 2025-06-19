@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 class FormQuestions extends StatelessWidget {
-  const FormQuestions({super.key});
+  const FormQuestions({super.key, required this.title, required this.dificultadSeleccionada, required this.cantidadPreguntas});
+  final String title;
+  final String dificultadSeleccionada;
+  final int cantidadPreguntas;
 
   @override
   Widget build(BuildContext context) {
     // Simulación de preguntas (podrían venir de una API)
     final preguntas = [
+      '¿Cuál es la capital de Francia?',
+      '¿Qué órgano bombea la sangre?',
+      '¿En qué año llegó el hombre a la luna?',
       '¿Cuál es la capital de Francia?',
       '¿Qué órgano bombea la sangre?',
       '¿En qué año llegó el hombre a la luna?',
@@ -16,18 +22,43 @@ class FormQuestions extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Cuestionario: Historia',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary,
-            fontSize: 24,
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+                fontSize: 24,
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Dificultad: $dificultadSeleccionada',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Preguntas: $cantidadPreguntas',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
       body: Container(
         color: color.secondary,
         child: ListView.builder(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(25.0),
           itemCount: preguntas.length,
           itemBuilder: (context, index) {
             return PreguntaCard(
