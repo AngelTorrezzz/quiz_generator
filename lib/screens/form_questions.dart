@@ -3,6 +3,8 @@ import 'package:quiz_generator/models/question_model.dart';
 import 'package:quiz_generator/providers/questions_provider.dart';
 
 class FormQuestions extends StatefulWidget {
+
+  // Constructor que recibe los parámetros necesarios para el cuestionario
   const FormQuestions({
     super.key,
     required this.temaString,
@@ -12,18 +14,22 @@ class FormQuestions extends StatefulWidget {
     required this.cantidadPreguntas,
   });
 
-  final String temaString;
-  final int temaId;
-  final String dificultadSeleccionadaString;
-  final String dificultadSeleccionadaId;
-  final int cantidadPreguntas;
+  // Variables necesarias para el cuestionario
+  final String temaString; // Nombre del tema
+  final int temaId; // ID del tema
+  final String dificultadSeleccionadaString; // Nombre de la dificultad seleccionada
+  final String dificultadSeleccionadaId; // ID de la dificultad seleccionada
+  final int cantidadPreguntas; // Cantidad de preguntas a mostrar
 
+  // Método para obtener las preguntas según los parámetros, util para inicializar el Future
   @override
   State<FormQuestions> createState() => _FormQuestionsState();
 }
 
 class _FormQuestionsState extends State<FormQuestions> {
+  // Future que obtiene las preguntas según los parámetros del constructor
   late Future<List<Pregunta>> _preguntasFuture;
+  // Lista para almacenar las respuestas del usuario
   late List<String?> respuestasUsuario;
 
   bool enviado = false;
@@ -34,7 +40,19 @@ class _FormQuestionsState extends State<FormQuestions> {
   void initState() {
     //print('TemaString: ${widget.temaString}, TemaId: ${widget.temaId}, DificultadString: ${widget.dificultadSeleccionadaString}, DificultadId: ${widget.dificultadSeleccionadaId}, Cantidad: ${widget.cantidadPreguntas}');
     super.initState();
-    _preguntasFuture = obtenerPreguntas(widget.temaId, widget.dificultadSeleccionadaId, widget.cantidadPreguntas);
+    _preguntasFuture = obtenerPreguntas(
+      widget.temaId,
+      widget.dificultadSeleccionadaId,
+      widget.cantidadPreguntas,
+    ).then((preguntas) {
+      for (var p in preguntas) {
+        p.opciones.shuffle(); // Mezclar las opciones de cada pregunta
+      }
+      return preguntas;
+    });
+
+    // Inicializar la lista de respuestas del usuario con null
+    // para cada pregunta, de acuerdo a la cantidad de preguntas seleccionadas
     respuestasUsuario = List<String?>.filled(widget.cantidadPreguntas, null);
   }
 
@@ -75,15 +93,22 @@ class _FormQuestionsState extends State<FormQuestions> {
           ),
         ),
         child: Center(
+          // FutureBuilder para manejar la carga de preguntas
+          // y mostrar el cuestionario una vez que se hayan obtenido las preguntas
           child: FutureBuilder<List<Pregunta>>(
             future: _preguntasFuture,
+            // Builder que construye el widget según el estado del Future
+            // Si está esperando, muestra un CircularProgressIndicator
+            // context especifica el contexto actual
+            // snapshot contiene el resultado del Future
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               }
-          
+
+              // Si el Future se completó con éxito, obtenemos las preguntas
               final preguntas = snapshot.data!;
               
               return Column(
@@ -169,18 +194,26 @@ class _FormQuestionsState extends State<FormQuestions> {
                           onPressed: (!yaEnvio)
                               ? null
                               : () {
-                                    // Reiniciar el estado del cuestionario
-                                    yaEnvio = false;
-                                    setState(() {
-                                      enviado = false;
-                                      respuestasUsuario = List<String?>.filled(widget.cantidadPreguntas, null);
-                                      // Opcional: puedes resetear aciertos a 0 también
-                                      aciertos = 0;
+                                  yaEnvio = false;
+                                  setState(() {
+                                    enviado = false;
+                                    respuestasUsuario = List<String?>.filled(widget.cantidadPreguntas, null);
+                                    aciertos = 0;
+                                    _preguntasFuture = obtenerPreguntas(
+                                      widget.temaId,
+                                      widget.dificultadSeleccionadaId,
+                                      widget.cantidadPreguntas,
+                                    ).then((preguntas) {
+                                      for (var p in preguntas) {
+                                        p.opciones.shuffle(); // Mezclar de nuevo
+                                      }
+                                      return preguntas;
                                     });
-                                  },
+                                  });
+                                },
                           icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.secondary),
                           label: Text(
-                            'Reintentar',
+                            'Nuevo cuestionario',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary,
                               fontSize: 18,
