@@ -29,6 +29,13 @@ class _FormGeneratorState extends State<FormGenerator> {
   String? temaSeleccionado;
   String? dificultadSeleccionada;
   int? cantidadPreguntas;
+  String? tipoPreguntaSeleccionada;
+  final Map<String, String> tiposPregunta = {
+    'Opción múltiple': 'multiple',
+    'Abiertas': 'open', // esto es simbólico; la API no lo usa, pero tú podría filtrarse si es necesario
+    'Ambas': 'all', // para incluir todos los tipos
+  };
+
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +144,60 @@ class _FormGeneratorState extends State<FormGenerator> {
                           ),
                         ),
                         Text(
+                          'Tipo de preguntas',
+                          style: TextStyle(fontSize: 24, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    DropdownButtonFormField<String>(
+                      hint: Text(
+                        'Selecciona el tipo de pregunta',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                      dropdownColor: Theme.of(context).colorScheme.tertiary,
+                      value: tipoPreguntaSeleccionada,
+                      items: tiposPregunta.keys.map((tipo) {
+                        return DropdownMenuItem<String>(
+                          value: tipo,
+                          child: Text(
+                            tipo,
+                            style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          tipoPreguntaSeleccionada = value!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiary),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 2),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                     Row(
+                      children: [
+                        Container(
+                          width: 10,
+                          height: 10,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        Text(
                           'Cantidad de preguntas',
                           style: TextStyle(fontSize: 24, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w600),
                         ),
@@ -177,6 +238,8 @@ class _FormGeneratorState extends State<FormGenerator> {
                               duration: const Duration(milliseconds: 1500),
                             ),
                           );
+                        } else {
+                          
                         }
                       },
                     ),
@@ -242,7 +305,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          if (temaSeleccionado == null || dificultadSeleccionada == null || cantidadPreguntas == null || (cantidadPreguntas != null && cantidadPreguntas! < 1)) {
+                          if (temaSeleccionado == null || dificultadSeleccionada == null || cantidadPreguntas == null || (cantidadPreguntas != null && cantidadPreguntas! < 1) || tipoPreguntaSeleccionada == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -263,13 +326,14 @@ class _FormGeneratorState extends State<FormGenerator> {
                                   dificultadSeleccionadaString: dificultadSeleccionada!,
                                   dificultadSeleccionadaId: dificultades[dificultadSeleccionada!]!,
                                   cantidadPreguntas: cantidadPreguntas!,
+                                  tipoPreguntaSeleccionada: tipoPreguntaSeleccionada!,
                                 ),
                               ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Formulario enviado',
+                                  'Generando Formulario...',
                                   style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                                 ),
                                 backgroundColor: Theme.of(context).colorScheme.primary,
